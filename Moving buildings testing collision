@@ -1,0 +1,159 @@
+int y = 150; //starting point
+int x; // starting x point
+boolean end=false;
+boolean intro=true;
+
+Building b1;
+Building b2;
+Building b3;
+Building b4;
+Building b5;
+Building b6;
+
+float s1x = 0;      // square position (move with mouse)
+float s1y = 0;
+float s1w = 30;     // and dimensions
+float s1h = 30;
+
+float s2x = 40;    // same for second square
+float s2y = 200;
+float s2w = 200;
+float s2h = 200;
+
+void setup() {
+    size(600, 400);
+  noStroke();
+  
+  x = width/4;
+
+  b1 = new Building(200, 200, 150, -1);
+  b2 = new Building(340, 320, 150, -1);
+  b3 = new Building (480, 260, 150, -1);
+  b4 = new Building (620, 230, 150, -1);
+  b5 = new Building (760, 120, 150, -1);
+  b6 = new Building (900, 310, 150, -1);
+}
+
+void draw() {
+
+  if (dist(0, 200, mouseX, mouseY)>= 400) {
+    background(255, 0, 0);
+  } else {
+    background(255);
+  }
+  
+  //background(255);
+  //command to draw the buldings
+  b1.drawBuilding();
+  b2.drawBuilding();
+  b3.drawBuilding();
+  b4.drawBuilding();
+  b5.drawBuilding();
+  b6.drawBuilding();
+  
+//mouse coordinates
+  s1x = mouseX;
+  s1y = mouseY;
+  
+   // check for collision
+  // if hit, game over
+  boolean hit = rectRect(s1x, s1y, s1w, s1h, s2x, s2y, s2w, s2h);
+
+ if (hit) {
+    text("game over", 170, 140);
+  } else {
+    fill(0);
+  }
+  rect(s2x, s2y, s2w, s2h);
+
+  // draw the other square
+  fill(0, 150);
+  rect(s1x, s1y, s1w, s1h);
+
+}
+
+
+// RECTANGLE/RECTANGLE
+boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) {
+
+  // are the sides of one rectangle touching the other?
+
+  if (r1x + r1w >= r2x &&    // r1 right edge past r2 left
+  r1x <= r2x + r2w &&    // r1 left edge past r2 right
+  r1y + r1h >= r2y &&    // r1 top edge past r2 bottom
+  r1y <= r2y + r2h) {    // r1 bottom edge past r2 top
+    return true;
+  }
+  return false;
+  
+
+  /* if (end) {
+    noLoop();// how the game stops
+    fill(0);
+    text("Game Over", 150, 200);
+  } else {
+    fill(0);
+    noStroke();
+    if (intro) {
+      fill(0);
+      stroke(255);
+      textSize(24);
+      text("Flappy Square", 650, 130);
+    } else {
+      text("game over", 170, 140);
+    } */
+  }
+
+  //player 
+  //fill(150);
+  //noStroke();
+  //rect(mouseX, mouseY, 20, 20);
+  //check
+  /* if (y < 100) {
+    println("Game Over!");
+    end=true;
+  }
+} */
+
+
+
+//new class
+
+class Building {
+  // Set up fields
+  int bX;
+  int bY;
+  int bHeight;
+  int bSpeed;
+  int bWidth;
+
+
+  // construct the class
+  Building (int a, int b, int c, int d) {
+    bX = a;
+    bY = height; // always draw from the bottom up
+    bHeight = b;
+    bWidth = c;
+    bSpeed = d;
+  }
+
+  //drawBuilding = looping
+  void drawBuilding() {
+    bX += bSpeed;
+    pushMatrix();
+    translate(bX, 0);
+    //building color
+    fill(44, 37, 28);
+    noStroke();
+    rect(bX, bY, bWidth, -bHeight );
+    //println(mX);
+    popMatrix();
+    //movement of buildings
+    if ( bX + 200 < 0) {
+      bX = width - 200;
+    }
+    if (rect(s2x, s2y, s2w, s2h)+ 200 < 0) {
+      rect(s2x, s2y, s2w, s2h)= width - 200;
+    }
+  }
+}
