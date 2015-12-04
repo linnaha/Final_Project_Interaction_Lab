@@ -1,3 +1,5 @@
+
+ 
 float s1x = 0;      // square position (move with mouse)
 float s1y = 0;
 float s1w = 30;     // and dimensions
@@ -28,10 +30,11 @@ void draw() {
   
   boolean hit = rectRect(s1x,s1y,s1w,s1h, s2x,s2y,s2w,s2h);
   if (hit) {
-    text("game over", 170, 140);
+    text("game over", 250, 140);
+    noLoop();
   }
   else {
-    fill(0);
+    text("flappy brid", 250, 140);
  
   }
   rect(s2x,s2y, s2w,s2h);
@@ -55,8 +58,4 @@ boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2
   }
   return false;
   
- if ( s2x + 100 < 0) {
-    s2x = width - 100;
-  }
 }
- 
