@@ -1,0 +1,209 @@
+// import the processing serial library
+import processing.serial.*;
+// create an port
+Serial myPort;
+// global variable means every function can access it
+int inByte;
+int y = 150; //starting point
+int x; // starting x point
+int velocity = 10; //speed going up
+int gravity = 5; //speed going down
+boolean end=false;
+boolean intro=true;
+Building b1;
+Building b2;
+Building b3;
+Building b4;
+Building b5;
+Building b6;
+void setup() {
+size(900, 600);
+// give x value
+x = width/4;
+myPort = new Serial(this, Serial.list()[2], 9600);
+// (bX,bY,width,speed)
+b1 = new Building(200, 200, 150, -1);
+b2 = new Building(340, 420, 150, -1);
+b3 = new Building (480, 360, 150, -1);
+b4 = new Building (620, 230, 150, -1);
+b5 = new Building (760, 420, 150, -1);
+b6 = new Building (900, 310, 150, -1);
+}
+void draw() {
+//sky
+background(183, 232, 245);
+// Sunset gradient
+/* I will using a loop to draw horizontal lines
+which change RGB values to create sunset gradient. */
+int x1 = 0;
+int y1 = 0;
+int x2 = 900;
+int y2 = 0;
+int R1 = 245;
+int G1 = 5;
+int B1 = 81;
+// The initial sunset color
+stroke(R1, G1, B1);
+// This loops draws 100 horizontal lines
+for (int x=0; x<=600; x++) {
+stroke(R1, G1, B1);
+line(x1, y1, x2, y2);
+y1++;
+y2++;
+G1++;
+}
+//sun
+fill(247, 233, 152);
+ellipse(0, 0, 200, 200);
+// cloud 0
+fill(255);
+noStroke();
+ellipse(110, 55, 80, 80);
+ellipse(120, 55, 50, 75);
+ellipse(130, 55, 75, 100);
+ellipse(140, 55, 100, 50);
+ellipse(150, 55, 50, 90);
+ellipse(160, 55, 50, 88);
+// cloud 1
+fill(255);
+ellipse(170, 55, 80, 80);
+ellipse(180, 55, 50, 75);
+ellipse(190, 55, 75, 100);
+ellipse(200, 55, 100, 50);
+ellipse(210, 55, 50, 90);
+ellipse(220, 55, 50, 88);
+ellipse(230, 55, 90, 50);
+ellipse(240, 55, 50, 75);
+//cloud 1
+ellipse(300, 50, 80, 80);
+ellipse(320, 50, 50, 75);
+ellipse(330, 50, 75, 100);
+ellipse(340, 50, 100, 50);
+ellipse(350, 50, 50, 90);
+ellipse(360, 50, 50, 88);
+ellipse(370, 50, 90, 50);
+ellipse(380, 50, 50, 75);
+ellipse(390, 50, 100, 100);
+ellipse(400, 50, 50, 50);
+//cloud 2
+ellipse(500, 65, 80, 80);
+ellipse(520, 65, 100, 105);
+ellipse(530, 65, 100, 100);
+ellipse(540, 65, 100, 50);
+ellipse(550, 65, 50, 90);
+ellipse(560, 65, 50, 88);
+ellipse(570, 65, 90, 50);
+ellipse(580, 65, 150, 75);
+ellipse(590, 65, 100, 100);
+ellipse(600, 65, 50, 50);
+//cloud 3
+ellipse(700, 50, 80, 80);
+ellipse(720, 50, 50, 75);
+ellipse(730, 50, 75, 100);
+ellipse(740, 50, 100, 50);
+ellipse(750, 50, 50, 90);
+ellipse(760, 50, 50, 88);
+ellipse(770, 50, 90, 50);
+ellipse(780, 50, 50, 75);
+ellipse(790, 50, 100, 100);
+ellipse(800, 50, 50, 50);
+//play options
+// how to get text to react with boolean function?
+fill(255);
+stroke(255);
+textSize(64);
+if (end) {
+noLoop();// how the game stops
+fill(0);
+text(“Game Over”, 150, 200);
+} else {
+fill(0);
+noStroke();
+if (intro) {
+fill(0);
+stroke(255);
+textSize(24);
+text(“Flappy Square”, 650, 130);
+} else {
+text(“game over”, 170, 140);
+}
+}
+// as long as my port is sending data, do something
+while (myPort.available () > 0) {
+inByte = myPort.read();
+// this prints the byte coming in
+println(inByte);
+// this changes the background color based on the byte
+}
+//command to draw the buldings
+b1.drawBuilding();
+b2.drawBuilding();
+b3.drawBuilding();
+b4.drawBuilding();
+b5.drawBuilding();
+b6.drawBuilding();
+//player color
+fill(150);
+noStroke();
+if (inByte==0) { // if the sensor isn’t touched
+if (y<550) { // if y is less than 550
+y = y + gravity; // add gravity to x
+}
+} else { // if the sensor is touched, go up!
+// if y is higher than 0 then add velocity
+if (y>0) {
+y = y – velocity;
+}
+}
+//player
+rect(x, y, 20, 20);
+//check
+if (y < 100) {
+println(“Game Over!”);
+end=true;
+}
+// println(“game over”);
+// check if game is over
+//if (inByte < b1) {
+//}
+}
+ 
+
+
+//make a new tab
+
+class Building {
+// Set up fields
+int bX;
+int bY;
+int bHeight;
+int bSpeed;
+int bWidth;
+// construct the class
+Building (int a, int b, int c, int d) {
+bX = a;
+bY = height; // always draw from the bottom up
+bHeight = b;
+bWidth = c;
+bSpeed = d;
+}
+//drawBuilding = looping
+void drawBuilding() {
+bX += bSpeed;
+pushMatrix();
+translate(bX, 0);
+//building color
+fill(44,37,28);
+rect(bX, bY, bWidth, -bHeight );
+//println(mX);
+popMatrix();
+//movement of buildings
+if ( bX + 200 < 0) {
+bX = width – 200;
+}
+}
+}
+}
+ 
+IMG_8600
+ 
