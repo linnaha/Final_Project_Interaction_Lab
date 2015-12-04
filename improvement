@@ -1,0 +1,127 @@
+float s1x = 0;      // square position (move with mouse)
+float s1y = 0;
+float s1w = 30;     // and dimensions
+float s1h = 30;
+
+float s2x = 300;
+float s2y = 250;
+float s2w = 50;
+float s2h = 200;
+
+float s3x = 300;
+float s3y = 0;
+float s3w = 50;
+float s3h = 150;
+
+float s4x = 400;
+float s4y = 250;
+float s4w = 50;
+float s4h = 200;
+
+float s5x = 400;
+float s5y = 200;
+float s5w = 50;
+float s5h = -200;
+
+float speed =2;
+int direction = 1;
+
+int opacity = 200;
+float textspeed = 0.001;
+
+// Declare and construct two objects (h1, h2) from the class HLine 
+building b1 = new building(20, 2.0); 
+building b2 = new building(50, 2.5); 
+ 
+
+void setup() {
+  size(440, 440);
+  smooth();
+  //noLoop();
+}
+
+void draw() {
+  background(255);
+  textAlign(CENTER);
+  textLeading(30);
+  fill(0,opacity);
+  opacity +=-1.2*textspeed;
+  String s = "      Flappy Square!            Use your mouse to keep the square from touching the buildings.  You get a point each time you fly over a building!";
+  text(s,20,50,200,300);
+  
+  
+ fill(0);
+stroke(0); 
+
+ b1.update();
+ b2.update();
+ 
+// update square to mouse coordinates
+  s1x = mouseX;
+  s1y = mouseY;
+  
+  s2x+= -speed * direction; //move building across the screen
+  s3x+= -speed * direction;
+  s4x+= -speed* direction;
+  s5x+= -speed* direction;
+  
+ fill(0);
+ rect(s2x,s2y, s2w,s2h);
+ rect(s3x,s3y,s3w,s3h);
+ rect(s4x,s4y,s4w,s4h);
+ rect(s5x,s5y,s5w,s5h);
+  
+  boolean hit = rectRect(s1x,s1y,s1w,s1h, bx,by,bw,bh);
+  if (hit) {
+    strokeWeight(5);
+    fill(69,17,245);
+    text("game over", 250, 140);
+    noLoop();
+  }
+  else {
+    fill(0);
+ 
+  }
+  
+  
+  // draw the other square
+  fill(0, 150);
+  rect(s1x,s1y, s1w,s1h);  
+}
+
+
+// RECTANGLE/RECTANGLE
+boolean rectRect(float r1x, float r1y, float r1w, float r1h, float r2x, float r2y, float r2w, float r2h) {
+  
+  // are the sides of one rectangle touching the other?
+  
+  if (r1x + r1w >= r2x &&    // r1 right edge past r2 left
+      r1x <= r2x + r2w &&    // r1 left edge past r2 right
+      r1y + r1h >= r2y &&    // r1 top edge past r2 bottom
+      r1y <= r2y + r2h) {    // r1 bottom edge past r2 top
+        return true;
+  }
+  return false;
+  
+}
+
+//new class
+
+
+class building { 
+  float bx, by, bw, bh ; 
+  HLine (float x, float y, float w, float h) {  
+    bx = x; 
+    by = y; 
+    bw= w;
+    bh= h;
+  } 
+  void update() { 
+  //speed
+  s5x+= -speed* direction;
+  
+ fill(0);
+ rect(s2x,s2y, s2w,s2h); 
+  } 
+} 
+ 
