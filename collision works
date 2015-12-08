@@ -1,0 +1,106 @@
+//float s1x, s1y;
+Building[] buildings = new Building[40];
+
+import processing.serial.*;
+// create an port
+Serial myPort;
+// global variable means every function can access it
+int inByte;
+int y = 150; //starting point
+int x; // starting x point
+int velocity = 10; //speed going up
+int gravity = 5; //speed going down
+void setup() {
+  size(1280, 800);
+  x = width/4;
+
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+  //arraylist buildings 
+  for (int i = 0; i < buildings.length; i++) {
+    int tempX = (i*150)+(width); // go up by 50 per building
+    int tempY = floor(random(150, height));// where you can randomize!
+    buildings[i] = new Building(tempX, tempY, 100, height-tempY);
+  }
+}
+
+void draw() {
+  background(255);
+  //  s1x = mouseX;
+  //  s1y = mouseY;
+
+  fill(255, 0, 0);
+  rect(x, y, 20, 20);
+
+  //  rect(50, 50, 100, 100);
+  for (int i = 0; i < buildings.length; i++) {
+    buildings[i].render();
+    buildings[i].update();
+    if (pointOverRect(buildings[i])) {// if I hit the building
+      noLoop();
+    }
+
+    while (myPort.available () > 0) {
+      inByte = myPort.read();
+      // this prints the byte coming in
+      println(inByte);
+      // this changes the background color based on the byte
+    }
+    //player color
+    fill(150);
+    noStroke();
+    if (inByte==0) { // if the sensor isn’t touched
+      if (y<550) { // if y is less than 550
+        y = y + gravity; // add gravity to x
+      }
+    } else { // if the sensor is touched, go up!
+      // if y is higher than 0 then add velocity
+      if (y>0) {
+        y = y - velocity;
+      }
+    }
+  }
+}
+
+
+boolean pointOverRect(Building tempB) { // Test if mouse is over square
+  return ((x >= tempB.bx) && (x <= (tempB.bx+tempB.bw)) && (y >= tempB.by) && (y <= (tempB.by+tempB.bh)));
+}
+
+
+//class building
+
+class Building { 
+  float bx, by, bw, bh ; 
+  float speed;
+  int direction;
+
+  Building (int x, int y, int w, int h) {  
+    bx = x; 
+    by = y; 
+    bw= w;
+    bh= h;
+    speed =1;
+    direction = 1;
+  }
+
+  void render() {
+    pushMatrix();
+    translate(bx, by);
+    //building color
+    fill(44, 37, 28);
+    rect(0, 0, bw, bh);
+    //println(mX);
+    popMatrix();
+  }
+
+  void update() { 
+    //speed
+    bx+= -speed* direction;
+
+    //movement of buildings
+    if ( bx + width < 0) {
+      bx = width;
+    }
+  }
+}
