@@ -1,0 +1,194 @@
+float s1x, s1y;
+Building[] buildings = new Building[40];
+PFont Gothic;
+
+import processing.serial.*;
+// create an port
+Serial myPort;
+// global variable means every function can access it
+int inByte;
+int y = 150; //starting point
+int x; // starting x point
+int velocity = 2; //speed going up
+int gravity = 1; //speed going down
+void setup() {
+  size(1280, 800);
+  x = width/4;
+Gothic = createFont("LetterGothicStd-Slanted", 64);
+
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+  //arraylist buildings 
+  for (int i = 0; i < buildings.length; i++) {
+    int tempX = (i*150)+(width); // go up by 50 per building
+    int tempY = floor(random(150, height));// where you can randomize!
+    buildings[i] = new Building(tempX, tempY, 100, height-tempY);
+  }
+}
+
+void draw() {
+ 
+  background(183, 232, 245);
+// Sunset gradient
+/* I will using a loop to draw horizontal lines
+which change RGB values to create sunset gradient. */
+int x1 = 0;
+int y1 = 0;
+int x2 = 1280;
+int y2 = 0;
+int R1 = 245;
+int G1 = 5;
+int B1 = 81;
+// The initial sunset color
+stroke(R1, G1, B1);
+// This loops draws 100 horizontal lines
+for (int x=0; x<=800; x++) {
+stroke(R1, G1, B1);
+line(x1, y1, x2, y2);
+y1++;
+y2++;
+G1++;
+}
+//sun
+fill(247, 233, 152);
+ellipse(0, 0, 200, 200);
+// cloud 0
+fill(255);
+noStroke();
+ellipse(110, 55, 80, 80);
+ellipse(120, 55, 50, 75);
+ellipse(130, 55, 75, 100);
+ellipse(140, 55, 100, 50);
+ellipse(150, 55, 50, 90);
+ellipse(160, 55, 50, 88);
+// cloud 1
+fill(255);
+ellipse(170, 55, 80, 80);
+ellipse(180, 55, 50, 75);
+ellipse(190, 55, 75, 100);
+ellipse(200, 55, 100, 50);
+ellipse(210, 55, 50, 90);
+ellipse(220, 55, 50, 88);
+ellipse(230, 55, 90, 50);
+ellipse(240, 55, 50, 75);
+//cloud 1
+ellipse(300, 50, 80, 80);
+ellipse(320, 50, 50, 75);
+ellipse(330, 50, 75, 100);
+ellipse(340, 50, 100, 50);
+ellipse(350, 50, 50, 90);
+ellipse(360, 50, 50, 88);
+ellipse(370, 50, 90, 50);
+ellipse(380, 50, 50, 75);
+ellipse(390, 50, 100, 100);
+ellipse(400, 50, 50, 50);
+//cloud 2
+ellipse(500, 65, 80, 80);
+ellipse(520, 65, 100, 105);
+ellipse(530, 65, 100, 100);
+ellipse(540, 65, 100, 50);
+ellipse(550, 65, 50, 90);
+ellipse(560, 65, 50, 88);
+ellipse(570, 65, 90, 50);
+ellipse(580, 65, 150, 75);
+ellipse(590, 65, 100, 100);
+ellipse(600, 65, 50, 50);
+//cloud 3
+ellipse(700, 50, 80, 80);
+ellipse(720, 50, 50, 75);
+ellipse(730, 50, 75, 100);
+ellipse(740, 50, 100, 50);
+ellipse(750, 50, 50, 90);
+ellipse(760, 50, 50, 88);
+ellipse(770, 50, 90, 50);
+ellipse(780, 50, 50, 75);
+ellipse(790, 50, 100, 100);
+ellipse(800, 50, 50, 50);
+
+  
+   s1x = mouseX;
+   s1y = mouseY;
+
+  fill(255, 0, 0);
+  rect(s1x, s1y, 20, 20);
+
+  //  rect(50, 50, 100, 100);
+  for (int i = 0; i < buildings.length; i++)  {
+    buildings[i].render();
+    buildings[i].update();
+    if (pointOverRect(buildings[i])) {// if I hit the building
+    fill(0,0,255);
+textSize(100);
+textFont(Gothic);
+text("Game Over",400,400);
+      noLoop();
+    }
+
+    while (myPort.available () > 0) {
+      inByte = myPort.read();
+      // this prints the byte coming in
+      println(inByte);
+      // this changes the background color based on the byte
+    }
+    //player color
+    fill(150);
+    noStroke();
+    if (x==0) { // if the sensor isn’t touched
+      if (y<550) { // if y is less than 550
+        y = y + gravity; // add gravity to x
+      }
+    } else { // if the sensor is touched, go up!
+      // if y is higher than 0 then add velocity
+      if (y>0) {
+        y = y - velocity;
+      }
+    }
+    if (s1y < 100) {
+println("Game Over!");
+
+}
+  }
+}
+
+
+boolean pointOverRect(Building tempB) { // Test if mouse is over square
+  return ((s1x >= tempB.bx) && (s1x <= (tempB.bx+tempB.bw)) && (s1y >= tempB.by) && (s1y <= (tempB.by+tempB.bh)));
+}
+
+
+// make a class 
+
+class Building { 
+  float bx, by, bw, bh ; 
+  float speed;
+  int direction;
+
+  Building (int x, int y, int w, int h) {  
+    bx = x; 
+    by = y; 
+    bw= w;
+    bh= h;
+    speed =3;
+    direction = 1;
+  }
+
+  void render() {
+    pushMatrix();
+    translate(bx, by);
+    //building color
+    fill(44, 37, 28);
+    rect(0, 0, bw, bh);
+    //println(mX);
+    popMatrix();
+  }
+
+  void update() { 
+    //speed
+    bx+= -speed* direction;
+
+    //movement of buildings
+    if ( bx + width < 0) {
+      bx = width;
+    }
+  }
+}
