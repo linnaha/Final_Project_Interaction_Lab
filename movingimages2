@@ -1,0 +1,21 @@
+int x, y;
+int xSpeed;
+PImage city;
+
+void setup() {
+  size(600, 600);
+
+  city=loadImage("shanghai.jpg");
+  city.resize(600, 600);
+
+  x=300; 
+  y=300;
+  xSpeed=3;
+}
+
+void draw() {
+  if (x>= 500)xSpeed = -xSpeed;
+
+  x= x+xSpeed;
+  image(city,x,y, 300, 300);
+}
