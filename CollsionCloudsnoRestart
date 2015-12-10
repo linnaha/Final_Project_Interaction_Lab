@@ -1,0 +1,212 @@
+//float s1x, s1y;
+Building[] buildings = new Building[40];
+PFont American;
+PImage bg;
+
+import processing.serial.*;
+// create an port
+Serial myPort;
+// global variable means every function can access it
+int inByte;
+int y = 150; //starting point
+int x; // starting x point
+int velocity = 10; //speed going up
+int gravity = 5; //speed going down
+void setup() {
+  size(1280, 800);
+  bg = loadImage("shanghai.gif");
+
+  x = width/4;
+  American= createFont("AmericanTypewriter-CondensedBold", 82);
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+  //arraylist buildings 
+  for (int i = 0; i < buildings.length; i++) {
+    int tempX = (i*150)+(width); // go up by 50 per building
+    int tempY = floor(random(150, height));// where you can randomize!
+    buildings[i] = new Building(tempX, tempY, 100, height-tempY);
+  }
+}
+
+void draw() {
+  image(bg, 0, 0, 1280, 800);
+  //  s1x = mouseX;
+  //  s1y = mouseY;
+
+  fill(209,18,85);
+  ellipse(x, y, 40, 40);
+  if (y <= 100) {
+println("Game Over!");
+}
+
+// cloud 0
+fill(87,6,140);
+noStroke();
+ellipse(110, 55, 80, 80);
+ellipse(120, 55, 50, 75);
+ellipse(130, 55, 75, 100);
+ellipse(140, 55, 100, 50);
+ellipse(150, 55, 50, 90);
+ellipse(160, 55, 50, 88);
+// cloud 1
+fill(87,6,140);
+ellipse(170, 55, 80, 80);
+ellipse(180, 55, 50, 75);
+ellipse(190, 55, 75, 100);
+ellipse(200, 55, 100, 50);
+ellipse(210, 55, 50, 90);
+ellipse(220, 55, 50, 88);
+ellipse(230, 55, 90, 50);
+ellipse(240, 55, 50, 75);
+//cloud 2
+fill(87,6,140);
+ellipse(300, 50, 80, 80);
+ellipse(320, 50, 50, 75);
+ellipse(330, 50, 75, 100);
+ellipse(340, 50, 100, 50);
+ellipse(350, 50, 50, 90);
+ellipse(360, 50, 50, 88);
+ellipse(370, 50, 90, 50);
+ellipse(380, 50, 50, 75);
+ellipse(390, 50, 100, 100);
+ellipse(400, 50, 50, 50);
+//cloud 3
+fill(87,6,140);
+ellipse(500, 65, 80, 80);
+ellipse(520, 65, 100, 105);
+ellipse(530, 65, 100, 100);
+ellipse(540, 65, 100, 50);
+ellipse(550, 65, 50, 90);
+ellipse(560, 65, 50, 88);
+ellipse(570, 65, 90, 50);
+ellipse(580, 65, 150, 75);
+ellipse(590, 65, 100, 100);
+ellipse(600, 65, 50, 50);
+//cloud 4
+fill(87,6,140);
+ellipse(700, 50, 80, 80);
+ellipse(720, 50, 50, 75);
+ellipse(730, 50, 75, 100);
+ellipse(740, 50, 100, 50);
+ellipse(750, 50, 50, 90);
+ellipse(760, 50, 50, 88);
+ellipse(770, 50, 90, 50);
+ellipse(780, 50, 50, 75);
+ellipse(790, 50, 100, 100);
+ellipse(800, 50, 50, 50);
+// cloud 5
+// cloud 0
+
+ellipse(870, 55, 80, 80);
+ellipse(880, 55, 50, 75);
+ellipse(890, 55, 75, 100);
+ellipse(900, 55, 100, 50);
+ellipse(910, 55, 50, 90);
+ellipse(920, 55, 50, 88);
+ellipse(930, 55, 90, 50);
+ellipse(940, 55, 50, 75);
+
+ellipse(1020, 65, 100, 100);
+ellipse(1030, 65, 100, 105);
+ellipse(1040, 65, 100, 100);
+ellipse(1050, 65, 150, 75);
+ellipse(1060, 65, 100, 100);
+
+ellipse(1120, 65, 50, 50);
+ellipse(1130, 55, 100, 50);
+ellipse(1140, 55, 100, 90);
+ellipse(1150, 50, 100, 110);
+ellipse(1160, 50, 100, 120);
+ellipse(1170, 50, 75, 100);
+ellipse(1180, 50, 100, 100);
+ellipse(1190, 50, 50, 90);
+ellipse(1200, 50, 100, 88);
+ellipse(1210, 50, 90, 100);
+ellipse(1220, 50, 50, 75);
+ellipse(1230, 50, 100, 100);
+ellipse(1240, 50, 50, 50);
+
+  
+  for (int i = 0; i < buildings.length; i++) {
+    buildings[i].render();
+    buildings[i].update();
+    if (pointOverRect(buildings[i])) {// if I hit the building
+      fill(87,6,140);
+
+      textSize(100);
+      textFont(American);
+      text("Game Over",640, 100);
+      textSize(50);
+      text("Click to restart",700,150);
+      noLoop();
+    }
+  }
+  while (myPort.available () > 0) {
+    inByte = myPort.read();
+    // this prints the byte coming in
+    println(inByte);
+    // this changes the background color based on the byte
+  }
+  //player color
+  fill(150);
+  noStroke();
+  if (inByte==0) { // if the sensor isn’t touched
+    if (y<550) { // if y is less than 550
+      y = y + gravity; // add gravity to x
+    }
+  } else { // if the sensor is touched, go up!
+    // if y is higher than 0 then add velocity
+    if (y>0) {
+      y = y - velocity;
+    }
+  }
+}
+
+
+
+boolean pointOverRect(Building tempB) { // Test if mouse is over square
+  return ((x >= tempB.bx) && (x <= (tempB.bx+tempB.bw)) && (y >= tempB.by) && (y <= (tempB.by+tempB.bh)));
+}
+
+//reset the game 
+void reset(){
+mouseClicked();
+setup();
+
+}
+//class building
+
+class Building { 
+  float bx, by, bw, bh ; 
+  float speed;
+  int direction;
+
+  Building (int x, int y, int w, int h) {  
+    bx = x; 
+    by = y; 
+    bw= w;
+    bh= h;
+    speed =3;
+    direction = 1;
+  }
+
+  void render() {
+    pushMatrix();
+    translate(bx, by);
+    //building color
+    fill(44, 37, 28,191);
+    rect(0, 0, bw, bh);
+    //println(mX);
+    popMatrix();
+  }
+
+  void update() { 
+    //speed
+    bx+= -speed* direction;
+
+    //movement of buildings
+    if ( bx + width < 0) {
+      bx = width;
+    }
+  }
+}
