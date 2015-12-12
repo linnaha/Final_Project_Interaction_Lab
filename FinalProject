@@ -1,0 +1,224 @@
+
+//float s1x, s1y;
+Building[] buildings = new Building[40];
+PFont American;
+//shanghai background
+PImage bg;
+//call clouds
+PImage clouds;
+Clouds myClouds;
+Clouds myClouds2;
+Clouds myClouds3;
+Clouds myClouds4;
+Clouds myClouds5;
+Clouds myClouds6;
+//serial commuinction
+import processing.serial.*;
+// create an port
+Serial myPort;
+// global variable means every function can access it
+int inByte;
+int y = 150; //starting point
+int x; // starting x point
+int velocity = 10; //speed going up
+int gravity = 5; //speed going down
+
+int bx = x; 
+int  by = y;
+int opacity=250; //intro text
+float textspeed= .05; //how fast text disappears
+
+
+void setup() {
+  size(1280, 800);
+  bg = loadImage("shanghai.gif");
+  clouds= loadImage("cloud.png");
+  clouds.resize(0,140);
+  
+  // clouds will create new instance
+  myClouds = new Clouds(0,0);
+  myClouds2 = new Clouds(250,0);
+  myClouds3 = new Clouds(500,0);
+  myClouds4 = new Clouds(700,0);
+  myClouds5 = new Clouds(900,0);
+  myClouds6 = new Clouds(1200,0);
+
+  x = width/4;
+  American= createFont("AmericanTypewriter-CondensedBold", 82);
+  myPort = new Serial(this, Serial.list()[2], 9600);
+
+  //arraylist buildings 
+  for (int i = 0; i < buildings.length; i++) {
+    int tempX = (i*200)+(width); // go up by 50 per building
+    int tempY = floor(random(140, height));// where you can randomize
+    buildings[i] = new Building(tempX, tempY, 150, height-tempY);
+  }
+}
+
+public void restart() {
+  size(1280, 800);
+  bg = loadImage("shanghai.gif");
+  clouds=loadImage("cloud.png");
+  clouds.resize(0,150);
+  
+  
+  x = width/4;
+  American= createFont("AmericanTypewriter-CondensedBold", 82);
+
+  //arraylist buildings 
+  for (int i = 0; i < buildings.length; i++) {
+    int tempX = (i*150)+(width); // go up by 50 per building
+    int tempY = floor(random(150, height));// where you can randomize!
+    buildings[i] = new Building(tempX, tempY, 100, height-tempY);
+
+  }
+}
+void mousePressed()
+{
+  loop();
+}
+void mouseReleased()
+{
+  restart();
+}
+
+void draw() {
+  image(bg, 0, 0, 1280, 800);
+
+  textAlign(CENTER);
+  textLeading(30);
+  textFont(American);
+  fill(0, opacity);
+  textSize(36);
+  text("Flappy Shanghai!", 200, 200);
+  textSize(20);
+  text("Jump to avoid the buildings and clouds.", 230, 230);
+
+  opacity +=-1.2*textspeed;
+
+myClouds.run();
+myClouds2.run();
+myClouds3.run();
+myClouds4.run();
+myClouds5.run();
+myClouds6.run();
+
+  //player ball
+  fill(209, 18, 85);
+  ellipse(x, y, 40, 40);
+  
+  // If the player hits the clouds
+  if (y < 120) {
+    textSize(100);
+    textFont(American);
+    text("Game Over", 610, 100);
+    textSize(50);
+    text("Click to restart", 700, 150);
+    noLoop();
+  }
+  //collision detection for buildings
+  for (int i = 0; i < buildings.length; i++) {
+    buildings[i].render();
+    buildings[i].update();
+    if (pointOverRect(buildings[i])) {// if I hit the building
+      fill(87, 6, 140);
+
+      textSize(100);
+      textFont(American);
+      text("Game Over", 640, 210);
+
+      textSize(50);
+      text("Click to restart", 700, 250);
+
+      noLoop();
+    }
+  }
+  while (myPort.available () > 0) {
+    inByte = myPort.read();
+    // this prints the byte coming in
+    println(inByte);
+    // this changes the background color based on the byte
+  }
+  //player color
+  fill(150);
+  noStroke();
+  if (inByte==0) { // if the sensor isn’t touched
+    if (y<550) { // if y is less than 550
+      y = y + gravity; // add gravity to x
+    }
+  } else { // if the sensor is touched, go up!
+    // if y is higher than 0 then add velocity
+    if (y>0) {
+      y = y - velocity;
+    }
+  }
+}
+
+
+
+boolean pointOverRect(Building tempB) { // Test if mouse is over square
+  return ((x >= tempB.bx) && (x <= (tempB.bx+tempB.bw)) && (y >= tempB.by) && (y <= (tempB.by+tempB.bh)));
+}
+
+//class Buildings
+
+//should be capitalized to indicate a class
+class Building { 
+  float bx, by, bw, bh ; 
+  float speed;
+  int direction;
+
+  Building (int x, int y, int w, int h) {  
+    bx = x; 
+    by = y; 
+    bw= w;
+    bh= h;
+    speed =3;
+    direction = 1;
+  }
+
+  void render() {
+    pushMatrix();
+    translate(bx, by);
+    //building color
+    fill(44, 37, 28,191);
+    rect(0, 0, bw, bh);
+    //println(mX);
+    popMatrix();
+  }
+
+  void update() { 
+    //speed
+    bx+= -speed* direction;
+
+    //movement of buildings
+    if ( bx + width < 0) {
+      bx = width;
+    }
+   
+  }
+}
+
+
+//Class Clouds
+
+class Clouds {
+  //x,y,width,height
+  int c =0 ;
+  int d = 0;
+
+  Clouds ( int _c, int _d) {
+    c= _c;
+    d= _d;
+    
+    
+  }
+
+  void run () {
+    display();
+  }
+  //display clouds
+  void display() {
+    image(clouds, c, d);
+  }
+}
