@@ -1,4 +1,4 @@
-# finalproject - "Flappy Shape - Shanghai Edition"
+# Final Project - "Flappy Shape - Shanghai Edition"
 
 This is a final project I did freshman year for Interaction Lab, a core class for the major Interactive Media Arts at NYU Shanghai. 
 
